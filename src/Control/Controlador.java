@@ -27,9 +27,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -71,8 +68,9 @@ public class Controlador implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-
-        if (ae.getSource() == f.btenRegistrarClinica) {
+///////////////////////////////////////////////////////////////////////////////////////
+        if (ae.getSource() == f.btenRegistrarClinica) 
+        {
             String nombre = f.jtNombreClinica.getText();
             String direccion = f.jtDireccionClinica.getText();
 
@@ -81,33 +79,40 @@ public class Controlador implements ActionListener {
                 ClinicaDAO cdao = new ClinicaDAO();
                 if (!this.existeElemento(nombre, "clinica", "nombre")) {
                     cdao.guardar(Conexion.obtener(), c);
-                    f.habilitarComponentes(f.panelRegistroPersona);
+                    
                     JOptionPane.showMessageDialog(null, "Clinica" + nombre + " registrada con exito");
+                    
+                    
                     try {
                         f.elminarClinicas();
                         f.mostrarDato("clinica", f.jComboBox1, "nombre");
 
                     } catch (ClassNotFoundException | SQLException e) {
-                        System.out.println(e.getMessage());
+                        JOptionPane.showMessageDialog(f, e.getMessage());
                     }
+                    
+                    
                 } else {
                     JOptionPane.showMessageDialog(null, "Clinica repetida, o faltan datos");
                 }
 
             } catch (HeadlessException | ClassNotFoundException | SQLException e) {
-                System.out.println(e.getMessage());
+                JOptionPane.showMessageDialog(f, e.getMessage());
             }
 
         }
-
-        if (ae.getSource() == f.comboTipoPersona) {
+        ///////////////////////////////////////////////////////////////////////////////////////
+        if (ae.getSource() == f.comboTipoPersona) 
+        {
 
             if (f.comboTipoPersona.getSelectedItem().equals("Paciente")) {
                 f.habilitarComponentes(f.panelRegistroPersona);
                 f.comboEspecialidad.setEnabled(false);
+                
             } else if (f.comboTipoPersona.getSelectedItem().equals("Seleccione")) {
                 f.deshabilitarComponentes(f.panelRegistroPersona);
                 f.comboTipoPersona.setEnabled(true);
+                
             } else {
                 f.habilitarComponentes(f.panelRegistroPersona);
 
@@ -118,8 +123,9 @@ public class Controlador implements ActionListener {
             }
 
         }
-
-        if (ae.getSource() == f.botonRegistrar) {
+        ///////////////////////////////////////////////////////////////////////////////////////
+        if (ae.getSource() == f.botonRegistrar) 
+        {
 
             String nombre = f.jtNombre.getText();
             String direccion = f.jtDireccion.getText();
@@ -128,11 +134,11 @@ public class Controlador implements ActionListener {
             String genero = f.jtGenero.getText();
             String nombreClinica = f.jComboBox1.getSelectedItem().toString();
 
-            if (f.comboTipoPersona.getSelectedItem().equals("Paciente")) {
+            if (f.comboTipoPersona.getSelectedItem().equals("Paciente")) 
+            {
 
                 EstadoVO estado = estado();
                 LugarProcedenciaVO lugar = new LugarProcedenciaVO(f.jtProcedencia.getText());
-
                 String fechas = f.jtFechaNacimiento.getText();
                 String[] fs = fechas.split("/");
                 int anio = Integer.parseInt(fs[0]);
@@ -159,17 +165,27 @@ public class Controlador implements ActionListener {
 
                 try {
 
-                    PacienteDAO pa = new PacienteDAO();
-                    PersonaDAO pe = new PersonaDAO();
+                    PacienteDAO paDAO = new PacienteDAO();
+                    PersonaDAO peDAO = new PersonaDAO();
                     PersonaVO persona = paciente;
-
+                    
+                    
+                    
                     if (!existeDocumento(documento)) {
 
                         LugarProcedenciaDAO lg = new LugarProcedenciaDAO();
                         lg.guardar(Conexion.obtener(), lugar);
-                        pe.guardar(Conexion.obtener(), persona, estadoPersona(estado));
+                        int estadoPersona;
+                        
+                        if (f.comboEstado.getSelectedItem().equals("positivo"))
+                            estadoPersona=1;
+                        else
+                            estadoPersona=0;
+                        
+                        peDAO.guardar(Conexion.obtener(), persona, estadoPersona);
 
-                        pa.guardar(
+                        paDAO.guardar
+                        (
                                 Conexion.obtener(), paciente,
                                 Conexion.buscarElemento(lugar.getNombre(), "lugar", "nombre"),
                                 Conexion.buscarElemento(nombreClinica, "clinica", "nombre"),
@@ -178,10 +194,10 @@ public class Controlador implements ActionListener {
                         );
 
                         JOptionPane.showMessageDialog(f, "Paciente " + nombre + " registrado");
-                    } else {
+                    } else 
                         JOptionPane.showMessageDialog(f, "Repetido");
 
-                    }
+                    
 
                 } catch (ClassNotFoundException | SQLException e) {
                     System.out.println(e.getMessage());
@@ -197,22 +213,17 @@ public class Controlador implements ActionListener {
                 int dia = Integer.parseInt(fs[2]);
 
                 java.sql.Date fechaNacimiento = new java.sql.Date(anio - 1900, mes - 1, dia);
-                PersonaSaludVO perso = new PersonaSaludVO();
-                perso.setDireccion(direccion);
-                perso.setDocumento(documento);
-                perso.setNombre(nombre);
-                perso.setGenero(genero);
-                perso.setTelefono(telefono);
-                perso.setFechaNacimiento(fechaNacimiento);
+                PersonaSaludVO perso = new PersonaSaludVO(documento,nombre,direccion,telefono,genero,fechaNacimiento);
+
 
                 PersonaSaludDAO personaSalud = new PersonaSaludDAO();
-                PersonaDAO pe = new PersonaDAO();
+                PersonaDAO peDAO = new PersonaDAO();
                 PersonaVO persona = perso;
 
                 try {
                     if (!existeDocumento(documento)) {
 
-                        pe.guardar(Conexion.obtener(), persona, 0);
+                        peDAO.guardar(Conexion.obtener(), persona, 0);
 
                         personaSalud.guardar(
                                 Conexion.obtener(), perso,
@@ -222,30 +233,30 @@ public class Controlador implements ActionListener {
                         );
 
                         JOptionPane.showMessageDialog(f, f.comboEspecialidad.getSelectedItem().toString() + " registrado");
-                    } else {
+                    } else 
                         JOptionPane.showMessageDialog(f, "Repetido");
 
-                    }
+                    
                 } catch (ClassNotFoundException | SQLException ex) {
-                    System.out.println(ex.getMessage());
+                    JOptionPane.showMessageDialog(f, ex.getMessage());
                 }
 
             }
 
         }
-
+        ///////////////////////////////////////////////////////////////////////////////////////
         if (ae.getSource() == f.botonRegistrarPrueba1) {
             try {
 
                 Boolean x = false;
 
-                if (f.comboEstadoP1.getSelectedItem().equals("Positivo")) {
+                if (f.comboEstadoP1.getSelectedItem().equals("Positivo")) 
                     x = true;
-                } else {
-                    if (f.comboEstadoP1.getSelectedItem().equals("Negativo")) {
+                 else 
+                    if (f.comboEstadoP1.getSelectedItem().equals("Negativo")) 
                         x = false;
-                    }
-                }
+                    
+                
 
                 int id = Conexion.buscarElemento(f.jTextField1.getText(), "persona", "documento");
                 int idSalud = Conexion.buscarElemento(Integer.toString(id), "personasalud", "persona");
@@ -260,17 +271,17 @@ public class Controlador implements ActionListener {
                     java.sql.Date fechaPrueba = new java.sql.Date(anio - 1900, mes - 1, dia);
                     PruebaDAO pr = new PruebaDAO();
                     
-                    if(x){
-                        
                      PreparedStatement stmt;
-                    Connection cnx = Conexion.obtener();
-                    stmt = cnx.prepareStatement("UPDATE persona SET estado=? WHERE id="+Integer.toString(id));
-                    stmt.setInt(1, 1);
+                    Connection cnx = Conexion.obtener();  
                     
-                    }
+                    if(x)        
+                        stmt = cnx.prepareStatement("UPDATE persona SET estado=1 WHERE id="+Integer.toString(id));
                     
+                    else
+                        stmt = cnx.prepareStatement("UPDATE persona SET estado=0 WHERE id="+Integer.toString(id));
                     
-                   
+                    stmt.executeUpdate();
+                    
                     
                     pr.guardar(Conexion.obtener(), new PruebaVO(fechaPrueba, x, new PersonaSaludVO()), idSalud);
                     JOptionPane.showMessageDialog(f, "Prueba registrada");
@@ -281,45 +292,39 @@ public class Controlador implements ActionListener {
                 }
 
             } catch (ClassNotFoundException | SQLException ex) {
-                System.out.println(ex.getMessage());
+                JOptionPane.showMessageDialog(f, ex.getMessage());
             }
 
         }
         ///////////////////////////////////////////////////////////////////////////////////////////
         if (ae.getSource() == f.btnBuscar) {
             try {
-                f.muertas.setText(cantidad("6"));
-                f.sospechosas.setText(cantidad("1"));
-                f.positivas.setText(cantidad("2"));
-                f.negativas.setText(cantidad("3"));
-                f.recuperadas.setText(cantidad("4"));
-                f.jTextArea1.setText(f.mostrarDatos());
-
+                f.muertas.setText(cantidad("6","persona","paciente","estado"));
+                f.sospechosas.setText(cantidad("1","persona","paciente","estado"));
+                f.positivas.setText(cantidad("1","estado","persona","estado"));
+                f.negativas.setText(cantidad("3","persona","paciente","estado"));
+                f.recuperadas.setText(cantidad("4","persona","paciente","estado"));
+                f.areaPersonasEnRiesgo.setText(f.mostrarDatos());
+                
             } catch (ClassNotFoundException | SQLException ex) {
-                Logger.getLogger(Controlador.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(f, ex.getMessage());
             }
 
         }
 
     }
 
-    public int estadoPersona(EstadoVO estado) {
-
-        if (estado.equals(EstadoVO.POSITIVO) || estado.equals(EstadoVO.SOSPECHOSO)) {
-            return 1;
-        } else {
-            return 0;
-        }
-    }
-
-    public String cantidad(String tipoEstado) throws ClassNotFoundException {
+  
+    
+    
+    public String cantidad(String tipoEstado, String datoContar,String tabla,String estado) throws ClassNotFoundException {
 
         try {
             Connection cnx = Conexion.obtener();
             PreparedStatement consulta;
             consulta = cnx.prepareStatement("select "
-                    + "count(persona) as cantidada "
-                    + "from paciente where estado=" + tipoEstado);
+                    + "count("+datoContar+") as cantidada "
+                    + "from "+tabla+" where "+estado+"=" + tipoEstado);
             ResultSet rs = consulta.executeQuery();
             String totalc = "";
 

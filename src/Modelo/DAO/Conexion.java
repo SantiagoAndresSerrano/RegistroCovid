@@ -38,26 +38,7 @@ public class Conexion {
         return cnx;
 
     }
-    
-     public int estadoPersonaSalud(String id){
-     int estado = 0;
-        
-    
-        String q = "SELECT * FROM personasalud WHERE where persona="+id;
-        try {
-            resultado = sentencia.executeQuery(q);
-            
-        } catch (SQLException e) {
-            System.out.println(" No se encuentra");
-        }
-         
-        return asignar();
-    
-    
-    
-    }
-    
-    
+
      public static  int buscarElemento(String Nombre,String tabla,String columna)
      {
         
@@ -72,31 +53,7 @@ public class Conexion {
         return asignar();
                 
     }
-     
-    public static String dato(){
-    String dato="";
-    
-    
-    
-    
-    return dato;
-    } 
-     
-    public static  int buscarFecha(String Nombre)
-     {
-        
-        String q = "SELECT * FROM persona WHERE fecha=??";
-        try {
-            resultado = sentencia.executeQuery(q);
-            
-        } catch (SQLException e) {
-            System.out.println(" No se encuentra");
-        }
-         
-        return asignar();
-                
-    } 
-    
+
     static  int asignar(){
      
       int id=-1;
@@ -111,10 +68,11 @@ public class Conexion {
       return id;
                 
     }
+    
+    
     public static void cerrar() throws SQLException {
 
         if (cnx != null) {
-
             cnx.close();
         }
 

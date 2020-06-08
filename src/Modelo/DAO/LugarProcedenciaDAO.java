@@ -14,7 +14,8 @@ import java.sql.SQLException;
  *
  * @author santi
  */
-public class LugarProcedenciaDAO {
+public class LugarProcedenciaDAO 
+{
     public void guardar(Connection conexion,LugarProcedenciaVO lugarVO)throws SQLException{
     
     try{

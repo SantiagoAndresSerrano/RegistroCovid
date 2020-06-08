@@ -24,6 +24,8 @@ public class Formulario extends javax.swing.JFrame {
 
     /**
      * Creates new form Formulario
+     * @throws java.sql.SQLException
+     * @throws java.lang.ClassNotFoundException
      */
     public Formulario() throws SQLException, ClassNotFoundException {
         initComponents();
@@ -49,15 +51,18 @@ public class Formulario extends javax.swing.JFrame {
         String sql = "Select * from persona ";
         Statement st = cn.createStatement();
         ResultSet rs = st.executeQuery(sql);
+        
+        
         while (rs.next()) {
 
             java.sql.Date fecha = rs.getDate("fechanacimiento");
+            int estado = rs.getInt("estado");
             int edad = calcularFecha(fecha);
-
-            if ((edad < 15 || edad > 50)) {
+            
+            if ((edad < 12 || edad > 50) &&  estado == 1) 
                 dato += "\n" + "Persona=" + rs.getString("nombre") + " edad=" + edad;
 
-            }
+            
         }
 
         return dato;
@@ -163,7 +168,7 @@ public class Formulario extends javax.swing.JFrame {
         negativas = new javax.swing.JTextField();
         jLabel38 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        areaPersonasEnRiesgo = new javax.swing.JTextArea();
         btnBuscar = new javax.swing.JButton();
         panelPrueba1 = new javax.swing.JPanel();
         jLabel21 = new javax.swing.JLabel();
@@ -483,9 +488,9 @@ public class Formulario extends javax.swing.JFrame {
         jLabel38.setForeground(new java.awt.Color(0, 0, 0));
         jLabel38.setText("Personas infectadas con mayor riesgo");
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        areaPersonasEnRiesgo.setColumns(20);
+        areaPersonasEnRiesgo.setRows(5);
+        jScrollPane1.setViewportView(areaPersonasEnRiesgo);
 
         btnBuscar.setText("Buscar ");
 
@@ -745,6 +750,7 @@ public class Formulario extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JTextArea areaPersonasEnRiesgo;
     public javax.swing.JButton botonRegistrar;
     public javax.swing.JButton botonRegistrarPrueba1;
     public javax.swing.JButton btenRegistrarClinica;
@@ -787,7 +793,6 @@ public class Formulario extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     public javax.swing.JLabel jLabel9;
     public javax.swing.JScrollPane jScrollPane1;
-    public javax.swing.JTextArea jTextArea1;
     public javax.swing.JTextField jTextField1;
     public javax.swing.JTextField jTextField3;
     public javax.swing.JTextField jtDireccion;
